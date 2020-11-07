@@ -74,23 +74,35 @@ const FoodDetails: React.FC = () => {
   useEffect(() => {
     async function loadFood(): Promise<void> {
       const response = await api.get<Food>(`/foods/${routeParams.id}`);
+
       const updatedFood = Object.assign(response.data, {
         formattedPrice: formatValue(response.data.price),
       });
 
       setFood(updatedFood);
-      setExtras(response.data.extras);
+
+      const updatedExtras = response.data.extras.map(extra =>
+        Object.assign(extra, { quantity: 0 }),
+      );
+
+      setExtras(updatedExtras);
     }
 
     loadFood();
   }, [routeParams]);
 
   function handleIncrementExtra(id: number): void {
-    // Increment extra quantity
+    const extraIndex = extras.findIndex(extra => extra.id === id);
+    extras[extraIndex].quantity += 1;
+
+    setExtras([...extras]);
   }
 
   function handleDecrementExtra(id: number): void {
-    // Decrement extra quantity
+    const extraIndex = extras.findIndex(extra => extra.id === id);
+    if (extras[extraIndex].quantity > 0) extras[extraIndex].quantity -= 1;
+
+    setExtras([...extras]);
   }
 
   function handleIncrementFood(): void {
