@@ -5,7 +5,7 @@ import React, {
   useMemo,
   useLayoutEffect,
 } from 'react';
-import { Image } from 'react-native';
+import { Alert, Image } from 'react-native';
 
 import Icon from 'react-native-vector-icons/Feather';
 import MaterialIcon from 'react-native-vector-icons/MaterialIcons';
@@ -128,8 +128,15 @@ const FoodDetails: React.FC = () => {
     return formatValue(calcFood + calcExtra);
   }, [extras, food, foodQuantity]);
 
-  async function handleFinishOrder(): Promise<void> {
-    // Finish the order and save on the API
+  async function handleFinishOrder(order: Food): Promise<void> {
+    await api
+      .post('/orders', order)
+      .catch(() =>
+        Alert.alert(
+          'Erro ao registrar o pedido!',
+          'Houve um erro ao registrar o seu pedido. Por favor, tente novamente mais tarde...',
+        ),
+      );
   }
 
   // Calculate the correct icon name
@@ -226,7 +233,7 @@ const FoodDetails: React.FC = () => {
             </QuantityContainer>
           </PriceButtonContainer>
 
-          <FinishOrderButton onPress={() => handleFinishOrder()}>
+          <FinishOrderButton onPress={() => handleFinishOrder(food)}>
             <ButtonText>Confirmar pedido</ButtonText>
             <IconContainer>
               <Icon name="check-square" size={24} color="#fff" />
